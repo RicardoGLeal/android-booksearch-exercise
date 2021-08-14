@@ -1,51 +1,36 @@
 package com.codepath.android.booksearch.activities;
 
 import android.os.Bundle;
-
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.codepath.android.booksearch.R;
-import com.codepath.android.booksearch.models.Book;
-
-import org.parceler.Parcels;
 
 public class BookDetailActivity extends AppCompatActivity {
     private ImageView ivBookCover;
     private TextView tvTitle;
     private TextView tvAuthor;
-    private TextView tvPublishYear;
 
-    Book book;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_detail);
+
         // Fetch views
         ivBookCover = (ImageView) findViewById(R.id.ivBookCover);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
-        tvPublishYear = findViewById(R.id.tvPublishYear);
-        // Extract book object from intent extras
-        book = Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        // Use book object to populate data into views
-        Glide.with(getApplicationContext())
-                .load(book.getCoverUrl())
-                .into(ivBookCover);
 
-        tvTitle.setText(book.getTitle());
-        tvAuthor.setText(book.getAuthor());
-        tvPublishYear.setText(book.getPublish_year());
-        //getSupportActionBar().setTitle(book.getTitle());
-        toolbar.setTitle(book.getTitle());
+        // Extract book object from intent extras
+
+        // Checkpoint #5
+        // Reuse the Toolbar previously used in the detailed activity by referring to this guide
+        // Follow using a Toolbar guide to set the Toolbar as the ActionBar.
+        // Change activity title to reflect the book title by referring to the Configuring The ActionBar guide.
+        // (Bonus) Get additional book information like publisher and publish_year from the Books API and display in details view.
     }
 
 
@@ -53,6 +38,10 @@ public class BookDetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_book_detail, menu);
+        // Checkpoint #6
+        // Add Share Intent
+        // see http://guides.codepath.org/android/Sharing-Content-with-Intents#shareactionprovider
+        // (Bonus) Share book title and cover image using the same intent.
         return true;
     }
 
