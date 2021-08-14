@@ -1,19 +1,29 @@
 package com.codepath.android.booksearch.activities;
 
 import android.os.Bundle;
+
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.android.booksearch.R;
+import com.codepath.android.booksearch.models.Book;
+
+import org.parceler.Parcels;
 
 public class BookDetailActivity extends AppCompatActivity {
     private ImageView ivBookCover;
     private TextView tvTitle;
     private TextView tvAuthor;
+    private TextView tvPublishYear;
 
+    Book book;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,10 +32,20 @@ public class BookDetailActivity extends AppCompatActivity {
         ivBookCover = (ImageView) findViewById(R.id.ivBookCover);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
-
+        tvPublishYear = findViewById(R.id.tvPublishYear);
         // Extract book object from intent extras
-
+        book = Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
+        Toolbar toolbar = findViewById(R.id.toolbar);
         // Use book object to populate data into views
+        Glide.with(getApplicationContext())
+                .load(book.getCoverUrl())
+                .into(ivBookCover);
+
+        tvTitle.setText(book.getTitle());
+        tvAuthor.setText(book.getAuthor());
+        tvPublishYear.setText(book.getPublish_year());
+        //getSupportActionBar().setTitle(book.getTitle());
+        toolbar.setTitle(book.getTitle());
     }
 
 

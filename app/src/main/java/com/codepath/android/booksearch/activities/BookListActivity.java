@@ -1,13 +1,20 @@
 package com.codepath.android.booksearch.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ShareActionProvider;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ActionProvider;
+import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,10 +26,13 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
 import okhttp3.Headers;
+import androidx.appcompat.widget.SearchView;
+
 
 
 public class BookListActivity extends AppCompatActivity {
@@ -30,15 +40,19 @@ public class BookListActivity extends AppCompatActivity {
     private BookAdapter bookAdapter;
     private BookClient client;
     private ArrayList<Book> abooks;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
 
+        Toolbar toolbar = findViewById(R.id.toolbar1);
+        setSupportActionBar(toolbar);
+
         rvBooks = findViewById(R.id.rvBooks);
         abooks = new ArrayList<>();
-
+        context = this;
         // Initialize the adapter
         bookAdapter = new BookAdapter(this, abooks);
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
@@ -51,8 +65,14 @@ public class BookListActivity extends AppCompatActivity {
 
                 // Handle item click here:
                 // Create Intent to start BookDetailActivity
+                Intent i = new Intent(context, BookDetailActivity.class);
+
                 // Get Book at the given position
+
                 // Pass the book into details activity using extras
+                i.putExtra(Book.class.getSimpleName(), Parcels.wrap(abooks.get(position)));
+                context.startActivity(i);
+
             }
         });
 
@@ -63,7 +83,6 @@ public class BookListActivity extends AppCompatActivity {
         rvBooks.setLayoutManager(new LinearLayoutManager(this));
 
         // Fetch the data remotely
-        fetchBooks("Oscar Wilde");
     }
 
     // Executes an API call to the OpenLibrary search endpoint, parses the results
@@ -105,11 +124,32 @@ public class BookListActivity extends AppCompatActivity {
         });
     }
 
+    private ActionProvider miShareAction;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_book_list, menu);
-        return true;
+
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+        miShareAction = MenuItemCompat.getActionProvider(item);
+
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                fetchBooks(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -117,6 +157,7 @@ public class BookListActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement

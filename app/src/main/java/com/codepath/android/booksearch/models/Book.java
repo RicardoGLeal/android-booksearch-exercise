@@ -5,13 +5,17 @@ import android.text.TextUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
 
+@Parcel
 public class Book {
     private String openLibraryId;
     private String author;
     private String title;
+
+    private String publish_year;
 
     public String getOpenLibraryId() {
         return openLibraryId;
@@ -30,6 +34,13 @@ public class Book {
         return "https://covers.openlibrary.org/b/olid/" + openLibraryId + "-L.jpg?default=false";
     }
 
+    public String getPublish_year() {
+        return publish_year;
+    }
+
+    public Book() {
+    }
+
     // Returns a Book given the expected JSON
     public static Book fromJson(JSONObject jsonObject) {
         Book book = new Book();
@@ -44,6 +55,7 @@ public class Book {
             }
             book.title = jsonObject.has("title_suggest") ? jsonObject.getString("title_suggest") : "";
             book.author = getAuthor(jsonObject);
+            book.publish_year = getPublishYear(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -67,6 +79,20 @@ public class Book {
         }
     }
 
+    // Return comma separated author list when there is more than one author
+    private static String getPublishYear(final JSONObject jsonObject) {
+        try {
+            final JSONArray publish = jsonObject.getJSONArray("publish_year");
+            int numPublish = publish.length();
+            final String[] publishStrings = new String[numPublish];
+            for (int i = 0; i < numPublish; ++i) {
+                publishStrings[i] = publish.getString(i);
+            }
+            return TextUtils.join(", ", publishStrings);
+        } catch (JSONException e) {
+            return "";
+        }
+    }
     // Decodes array of book json results into business model objects
     public static ArrayList<Book> fromJson(JSONArray jsonArray) {
         ArrayList<Book> books = new ArrayList<>(jsonArray.length());
